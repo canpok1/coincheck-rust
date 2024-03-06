@@ -57,6 +57,17 @@ impl OrderType {
     }
 }
 
+#[derive(Deserialize, Clone, Debug)]
+pub struct Ticker {
+    pub last: f64,
+    pub bid: f64,
+    pub ask: f64,
+    pub high: f64,
+    pub low: f64,
+    pub volume: f64,
+    pub timestamp: u64,
+}
+
 #[derive(Deserialize, Clone, Debug, Default)]
 pub struct OrderBooks {
     pub asks: Vec<OrderBook>,

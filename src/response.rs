@@ -13,6 +13,33 @@ pub struct ErrorResponse {
     pub error: String,
 }
 
+// ティッカー取得
+// GET /api/ticker
+#[derive(Deserialize, Debug)]
+pub struct TickerGetResponse {
+    pub last: f64,
+    pub bid: f64,
+    pub ask: f64,
+    pub high: f64,
+    pub low: f64,
+    pub volume: f64,
+    pub timestamp: u64,
+}
+
+impl TickerGetResponse {
+    pub fn to_model(&self) -> MyResult<model::Ticker> {
+        Ok(model::Ticker {
+            last: self.last,
+            bid: self.bid,
+            ask: self.ask,
+            high: self.high,
+            low: self.low,
+            volume: self.volume,
+            timestamp: self.timestamp,
+        })
+    }
+}
+
 // 板情報取得
 // GET /api/order_books
 #[derive(Deserialize, Debug)]

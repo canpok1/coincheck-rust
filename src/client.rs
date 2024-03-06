@@ -1,6 +1,6 @@
 use crate::error::MyError::{ParseError, ResponseError};
 use crate::error::MyResult;
-use crate::model::{Balance, NewOrder, OpenOrder, Order, OrderBooks, OrderType};
+use crate::model::{Balance, NewOrder, OpenOrder, Order, OrderBooks, OrderType, Ticker};
 use crate::request::OrdersPostRequest;
 use crate::response::*;
 use std::time::Duration;
@@ -25,6 +25,8 @@ const RETRY_INTERVAL_MS: u64 = 10;
 #[async_trait]
 #[automock]
 pub trait Client {
+    async fn get_ticker(&self, pair: &str) -> MyResult<Ticker>;
+
     async fn get_order_books(&self, pair: &str) -> MyResult<OrderBooks>;
 
     async fn get_exchange_orders_rate(
@@ -54,6 +56,20 @@ pub struct DefaultClient {
 
 #[async_trait]
 impl Client for DefaultClient {
+    async fn get_ticker(&self, pair: &str) -> MyResult<Ticker> {
+        let url = format!("{}{}", BASE_URL, "/api/ticker");
+        let params = [("pair", pair)];
+        let body = self
+            .client
+            .get(&url)
+            .query(&params)
+            .send()
+            .await?
+            .json::<TickerGetResponse>()
+            .await?;
+        body.to_model()
+    }
+
     async fn get_order_books(&self, pair: &str) -> MyResult<OrderBooks> {
         let url = format!("{}{}", BASE_URL, "/api/order_books");
         let params = [("pair", pair)];
